@@ -156,12 +156,12 @@ def game(quant_r, quant_p, quant_s):
         if verify_is_ended["simulation_is_finish"] is True:
             end_of_game = datetime.now()
             winner_pos = get_cords_by_tag(items, verify_is_ended["winner"])
-            print(" \n \n \n fim de jogo")
-            print("\n duration", end_of_game - start_of_game)
-            print("\n init of s ", init_of_s_pos)
-            print("\n init of r ", init_of_r_pos)
-            print("\n init of p ", init_of_p_pos)
-            print("\n winner_pos ", winner_pos)
+            # print(" \n \n \n fim de jogo")
+            # print("\n duration", end_of_game - start_of_game)
+            # print("\n init of s ", init_of_s_pos)
+            # print("\n init of r ", init_of_r_pos)
+            # print("\n init of p ", init_of_p_pos)
+            # print("\n winner_pos ", winner_pos)
             # Adicionando nossos dados no nosso dataframe
             diff = end_of_game - start_of_game
             diff_in_milli_secs = diff.total_seconds() * 1000
@@ -333,8 +333,10 @@ def game(quant_r, quant_p, quant_s):
         clock.tick(FPS)
 
 
-for i in range(5):
+
+for i in range(1500):
     game(33, 33, 33)
+    print(str(i)+" of 1500 \n")
 
 simulations_csv_data = df.to_csv("simul.csv", index=False)
 pygame.quit()
