@@ -1,6 +1,9 @@
+# import json
 import math
 import random
+from datetime import datetime
 
+import pandas as pd
 import pygame
 
 pygame.init()
@@ -11,7 +14,7 @@ RESY = 640
 screen = pygame.display.set_mode((RESX, RESY))
 pygame.display.set_caption("Rock Paper Scissors")
 clock = pygame.time.Clock()
-FPS = 30
+FPS = 450
 
 img_rock = pygame.image.load("emoji_rock.png").convert_alpha()
 img_paper = pygame.image.load("emoji_paper.png").convert_alpha()
@@ -20,6 +23,10 @@ img_scissors = pygame.image.load("emoji_scissors.png").convert_alpha()
 sfx_rock = pygame.mixer.Sound("sound_rock.wav")
 sfx_paper = pygame.mixer.Sound("sound_paper.wav")
 sfx_scissors = pygame.mixer.Sound("sound_scissors.wav")
+
+
+df = pd.DataFrame()
+df = pd.read_csv("simul.csv")
 
 
 class Item:
@@ -53,21 +60,72 @@ class Item:
             self.y = RESY - 20
         self.draw()
 
+    def to_dict(self):
+        return {
+            "x": self.x,
+            "y": self.y,
+            "radius": self.r,
+            "velocity": self.velocity,
+            "type": self.type,
+        }
 
-# random.seed(3)
+    def getCords(self):
+        return [self.x, self.y]
 
 
-def verifyEndOfGame(items):
-    print("end")
+def get_cords_by_tag(items, tag):
+    tag_cords = []
+    for i in range(len(items)):
+        if items[i].type == tag:
+            tag_cords.append((items[i].x, items[i].y))
+    return tag_cords
+
+
+def get_count_of_elems(items):
+    n_of_s = 0
+    n_of_r = 0
+    n_of_p = 0
+    for i in range(len(items)):
+        if items[i].type == "r":
+            n_of_r += 1
+        elif items[i].type == "s":
+            n_of_s += 1
+        elif items[i].type == "p":
+            n_of_p += 1
+    return {
+        "r": n_of_r,
+        "p": n_of_p,
+        "s": n_of_s,
+    }
+
+
+def verify_end(items, total_items):
+    elems_count = get_count_of_elems(items)
+    winner = ""
+    end = False
+    if elems_count["r"] == total_items:
+        winner = "r"
+    elif elems_count["p"] == total_items:
+        winner = "p"
+    elif elems_count["s"] == total_items:
+        winner = "s"
+    if winner != "":
+        end = True
+
+    return {
+        "simulation_is_finish": end,
+        "winner": winner,
+    }
 
 
 def game(quant_r, quant_p, quant_s):
+    start_of_game = datetime.now()
     items = []
     for _ in range(33):
         items.append(
             Item(
                 (random.randint(20, RESX - 20), random.randint(20, RESY - 20)),
-                quant_r,
+                10,
                 (0, 0),
                 "r",
             )
@@ -75,7 +133,7 @@ def game(quant_r, quant_p, quant_s):
         items.append(
             Item(
                 (random.randint(20, RESX - 20), random.randint(20, RESY - 20)),
-                quant_p,
+                10,
                 (0, 0),
                 "p",
             )
@@ -83,13 +141,45 @@ def game(quant_r, quant_p, quant_s):
         items.append(
             Item(
                 (random.randint(20, RESX - 20), random.randint(20, RESY - 20)),
-                quant_s,
+                10,
                 (0, 0),
                 "s",
             )
         )
-        # print(*items)
+    init_of_s_pos = get_cords_by_tag(items, "s")
+    init_of_r_pos = get_cords_by_tag(items, "r")
+    init_of_p_pos = get_cords_by_tag(items, "p")
+
     while True:
+        # print(verify_end(items, 99))
+        verify_is_ended = verify_end(items, 99)
+        if verify_is_ended["simulation_is_finish"] is True:
+            end_of_game = datetime.now()
+            winner_pos = get_cords_by_tag(items, verify_is_ended["winner"])
+            print(" \n \n \n fim de jogo")
+            print("\n duration", end_of_game - start_of_game)
+            print("\n init of s ", init_of_s_pos)
+            print("\n init of r ", init_of_r_pos)
+            print("\n init of p ", init_of_p_pos)
+            print("\n winner_pos ", winner_pos)
+            # Adicionando nossos dados no nosso dataframe
+            diff = end_of_game - start_of_game
+            diff_in_milli_secs = diff.total_seconds() * 1000
+            df_line = {
+                "duration": diff_in_milli_secs,
+                "count_of_s": quant_s,
+                "count_of_r": quant_r,
+                "count_of_p": quant_p,
+                "init_of_s_pos": init_of_s_pos,
+                "init_of_r_pos": init_of_r_pos,
+                "init_of_p_pos": init_of_p_pos,
+                "winner": verify_is_ended["winner"],
+                "winner_pos": winner_pos,
+            }
+            global df
+            df = df.append(df_line, ignore_index=True)
+            break
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
@@ -98,9 +188,6 @@ def game(quant_r, quant_p, quant_s):
         rocks = [item for item in items if item.type == "r"]
         papers = [item for item in items if item.type == "p"]
         sciss = [item for item in items if item.type == "s"]
-
-        for x in range(len(rocks)):
-            print(rocks[x]),
 
         for item in items:
             r = 1
@@ -246,5 +333,8 @@ def game(quant_r, quant_p, quant_s):
         clock.tick(FPS)
 
 
-game(10, 10, 10)
+for i in range(5):
+    game(33, 33, 33)
+
+simulations_csv_data = df.to_csv("simul.csv", index=False)
 pygame.quit()
