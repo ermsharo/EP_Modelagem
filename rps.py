@@ -334,7 +334,7 @@ def game(quant_r, quant_p, quant_s):
 
 
 
-for i in range(1500):
+for i in range(2500):
     game(33, 33, 33)
     print(str(i)+" of 1500 \n")
 
