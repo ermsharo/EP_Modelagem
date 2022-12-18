@@ -3,7 +3,7 @@ import pandas as pd
 import ast
 
 df = pd.DataFrame()
-df = pd.read_csv("rand_simul.csv")
+df = pd.read_csv("simul.csv")
 
 
 def string_to_list(str_of_list):
@@ -103,7 +103,7 @@ def add_collumns_df():
 
     # print("df", df)
     df2 = df
-    df2.to_csv("rand_simul_new.csv", index=False)
+    df2.to_csv("simul_new.csv", index=False)
 
 
 add_collumns_df()
