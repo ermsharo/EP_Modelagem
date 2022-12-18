@@ -3,7 +3,7 @@ import math
 import random
 from datetime import datetime
 
-import pandas as pd
+# import pandas as pd
 import pygame
 
 pygame.init()
@@ -14,7 +14,7 @@ RESY = 640
 screen = pygame.display.set_mode((RESX, RESY))
 pygame.display.set_caption("Rock Paper Scissors")
 clock = pygame.time.Clock()
-FPS = 450
+FPS = 30
 
 img_rock = pygame.image.load("emoji_rock.png").convert_alpha()
 img_paper = pygame.image.load("emoji_paper.png").convert_alpha()
@@ -25,8 +25,8 @@ sfx_paper = pygame.mixer.Sound("sound_paper.wav")
 sfx_scissors = pygame.mixer.Sound("sound_scissors.wav")
 
 
-df = pd.DataFrame()
-df = pd.read_csv("simul.csv")
+# df = pd.DataFrame()
+# df = pd.read_csv("simul.csv")
 
 
 class Item:
@@ -176,8 +176,8 @@ def game(quant_r, quant_p, quant_s):
                 "winner": verify_is_ended["winner"],
                 "winner_pos": winner_pos,
             }
-            global df
-            df = df.append(df_line, ignore_index=True)
+            # global df
+            # df = df.append(df_line, ignore_index=True)
             break
 
         for event in pygame.event.get():
@@ -334,9 +334,8 @@ def game(quant_r, quant_p, quant_s):
 
 
 
-for i in range(2500):
+for i in range(3):
     game(33, 33, 33)
-    print(str(i)+" of 1500 \n")
 
-simulations_csv_data = df.to_csv("simul.csv", index=False)
+# simulations_csv_data = df.to_csv("simul.csv", index=False)
 pygame.quit()

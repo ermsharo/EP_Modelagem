@@ -19,7 +19,7 @@ def get_points_area(points):
 
 
 def get_points_density(area, number):
-    return area / number
+    return number / area
 
 
 def get_points_center(points):
